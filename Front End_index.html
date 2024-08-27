@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chess-like Game</title>
+    <style>
+        #game-board {
+            display: grid;
+            grid-template-columns: repeat(5, 50px);
+            grid-template-rows: repeat(5, 50px);
+            gap: 5px;
+        }
+        .cell {
+            width: 50px;
+            height: 50px;
+            border: 1px solid black;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .player-A {
+            background-color: lightblue;
+        }
+        .player-B {
+            background-color: lightcoral;
+        }
+    </style>
+</head>
+<body>
+    <h1>Chess-like Game</h1>
+    <div id="game-board"></div>
+    <script src="client.js"></script>
+</body>
+</html>
