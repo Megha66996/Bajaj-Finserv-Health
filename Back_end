@@ -1,0 +1,55 @@
+import asyncio
+import websockets
+import json
+
+class GameServer:
+    def __init__(self):
+        self.clients = set()
+        self.game_state = self.initialize_game()
+
+    def initialize_game(self):
+        # Initial empty 5x5 grid
+        return [['' for _ in range(5)] for _ in range(5)]
+
+    async def register(self, websocket):
+        self.clients.add(websocket)
+        await self.send_game_state(websocket)
+
+    async def unregister(self, websocket):
+        self.clients.remove(websocket)
+
+    async def send_game_state(self, websocket=None):
+        if websocket:
+            await websocket.send(json.dumps({"type": "state_update", "game_state": self.game_state}))
+        else:
+            if self.clients:  # Broadcast to all clients
+                message = json.dumps({"type": "state_update", "game_state": self.game_state})
+                await asyncio.wait([client.send(message) for client in self.clients])
+
+    async def handle_move(self, move_data):
+        # Simplified move handling
+        char_name = move_data['character']
+        move = move_data['move']
+        # Logic to update the game state based on the move
+        # Example: Update self.game_state here
+
+        # After processing, broadcast the updated game state
+        await self.send_game_state()
+
+    async def handle_messages(self, websocket, path):
+        await self.register(websocket)
+        try:
+            async for message in websocket:
+                data = json.loads(message)
+                if data['type'] == 'move':
+                    await self.handle_move(data)
+        finally:
+            await self.unregister(websocket)
+
+async def main():
+    server = GameServer()
+    start_server = await websockets.serve(server.handle_messages, "localhost", 6789)
+    await start_server.wait_closed()
+
+# Run the server using asyncio.run if the event loop is not already running
+asyncio.run(main())
